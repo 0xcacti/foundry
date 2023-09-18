@@ -106,6 +106,8 @@ pub struct EthApi {
     transaction_order: Arc<RwLock<TransactionOrder>>,
     /// Whether we're listening for RPC calls
     net_listening: bool,
+    /// Whether chaos mode is enabled
+    chaos_enabled: bool,
 }
 
 // === impl Eth RPC API ===
@@ -123,6 +125,7 @@ impl EthApi {
         logger: LoggingManager,
         filters: Filters,
         transactions_order: TransactionOrder,
+        chaos_enabled: bool,
     ) -> Self {
         Self {
             pool,
@@ -136,6 +139,7 @@ impl EthApi {
             filters,
             net_listening: true,
             transaction_order: Arc::new(RwLock::new(transactions_order)),
+            chaos_enabled,
         }
     }
 
@@ -394,6 +398,23 @@ impl EthApi {
                 self.ots_get_contract_creator(address).await.to_rpc_result()
             }
         }
+    }
+
+    fn intercept(&self, req: EthRequest) -> ResponseResult {
+        // Define the probability of failure, for example 10%.
+        const FAILURE_RATE: f64 = 0.1;
+
+        let mut rng = rand::thread_rng();
+        if rng.gen::<f64>() < FAILURE_RATE {
+            // Return a simulated RPC error.
+            // TODO: figure out what this error should be
+            return ResponseResult::Error(RpcError {
+                code: -32000, // Generic server error code, adjust as needed
+                message: "Simulated RPC error due to fault injection.".to_string(),
+                // ... set other fields as necessary
+            })
+        }
+        Ok(())
     }
 
     fn sign_request(
