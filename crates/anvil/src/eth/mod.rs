@@ -6,6 +6,7 @@ pub mod backend;
 
 pub mod error;
 
+pub mod chaos;
 pub mod fees;
 pub(crate) mod macros;
 pub mod miner;

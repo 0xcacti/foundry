@@ -50,6 +50,8 @@ use crate::server::{
 };
 pub use hardfork::Hardfork;
 
+/// support for chaos mode (fault injection)
+pub mod chaos;
 /// ethereum related implementations
 pub mod eth;
 /// support for polling filters
@@ -160,7 +162,6 @@ pub async fn spawn(mut config: NodeConfig) -> (EthApi, NodeHandle) {
         logger,
         filters.clone(),
         transaction_order,
-        chaos,
     );
 
     // spawn the node service

@@ -1,4 +1,5 @@
 use crate::{
+    chaos::ChaosConfig,
     eth::{
         backend::{
             db::{Db, SerializableState},
@@ -159,7 +160,7 @@ pub struct NodeConfig {
     /// Configure the code size limit
     pub code_size_limit: Option<usize>,
     /// Enable chaos mode for RPC fault injection
-    pub enable_chaos: bool,
+    pub chaos_config: Option<ChaosConfig>,
     /// Configures how to remove historic state.
     ///
     /// If set to `Some(num)` keep latest num state in memory only.
@@ -402,7 +403,7 @@ impl Default for NodeConfig {
             compute_units_per_second: ALCHEMY_FREE_TIER_CUPS,
             ipc_path: None,
             code_size_limit: None,
-            enable_chaos: false,
+            chaos_config: None,
             prune_history: Default::default(),
             init_state: None,
             transaction_block_keeper: None,
@@ -437,8 +438,8 @@ impl NodeConfig {
     }
 
     /// Sets the chaos mode
-    pub fn with_chaos(mut self, enable_chaos: bool) -> Self {
-        self.enable_chaos = enable_chaos;
+    pub fn with_chaos(mut self, chaos_config: Option<ChaosConfig>) -> Self {
+        self.chaos_config = chaos_config;
         self
     }
 

@@ -67,6 +67,7 @@ use foundry_evm::{
 };
 use futures::channel::mpsc::Receiver;
 use parking_lot::RwLock;
+use rand::{thread_rng, Rng};
 use std::{collections::HashSet, sync::Arc, time::Duration};
 use tracing::{trace, warn};
 
@@ -106,8 +107,6 @@ pub struct EthApi {
     transaction_order: Arc<RwLock<TransactionOrder>>,
     /// Whether we're listening for RPC calls
     net_listening: bool,
-    /// Whether chaos mode is enabled
-    chaos_enabled: bool,
 }
 
 // === impl Eth RPC API ===
@@ -125,7 +124,6 @@ impl EthApi {
         logger: LoggingManager,
         filters: Filters,
         transactions_order: TransactionOrder,
-        chaos_enabled: bool,
     ) -> Self {
         Self {
             pool,
@@ -139,7 +137,6 @@ impl EthApi {
             filters,
             net_listening: true,
             transaction_order: Arc::new(RwLock::new(transactions_order)),
-            chaos_enabled,
         }
     }
 
@@ -400,21 +397,18 @@ impl EthApi {
         }
     }
 
-    fn intercept(&self, req: EthRequest) -> ResponseResult {
-        // Define the probability of failure, for example 10%.
-        const FAILURE_RATE: f64 = 0.1;
-
-        let mut rng = rand::thread_rng();
-        if rng.gen::<f64>() < FAILURE_RATE {
-            // Return a simulated RPC error.
-            // TODO: figure out what this error should be
-            return ResponseResult::Error(RpcError {
-                code: -32000, // Generic server error code, adjust as needed
-                message: "Simulated RPC error due to fault injection.".to_string(),
-                // ... set other fields as necessary
-            })
+    fn intercept_execute(&self, request: &EthRequest) -> Option<ResponseResult> {
+        if self.chaos_enabled {
+            let random_val: f64 = rand::random(); // Assuming you have rand crate
+            if random_val <= self.failure_probability() {
+                return Some(ResponseResult::Error(RpcError {
+                    code: ErrorCode::ServerError(5000), // Example error code, you can change this
+                    message: Cow::Borrowed("Chaos interception triggered"),
+                    data: None,
+                }))
+            }
         }
-        Ok(())
+        None
     }
 
     fn sign_request(
