@@ -42,7 +42,10 @@ use anvil_core::{
     },
     types::{EvmMineOptions, Forking, Index, NodeEnvironment, NodeForkConfig, NodeInfo, Work},
 };
-use anvil_rpc::{error::RpcError, response::ResponseResult};
+use anvil_rpc::{
+    error::{ErrorCode, RpcError},
+    response::ResponseResult,
+};
 use ethers::{
     abi::ethereum_types::H64,
     prelude::{DefaultFrame, TxpoolInspect},
@@ -69,7 +72,7 @@ use foundry_evm::{
 use futures::channel::mpsc::Receiver;
 use parking_lot::RwLock;
 use rand::{thread_rng, Rng};
-use std::{collections::HashSet, sync::Arc, time::Duration};
+use std::{borrow::Cow, collections::HashSet, sync::Arc, time::Duration};
 use tracing::{trace, warn};
 
 use super::{backend::mem::BlockRequest, sign::build_typed_transaction};
@@ -403,7 +406,7 @@ impl EthApi {
     }
 
     fn intercept_execute(&self, request: &EthRequest) -> Option<ResponseResult> {
-        if self.chaos_enabled {
+        if let Some(chaos_config) = &self.chaos_config {
             let random_val: f64 = rand::random(); // Assuming you have rand crate
             if random_val <= self.failure_probability() {
                 return Some(ResponseResult::Error(RpcError {

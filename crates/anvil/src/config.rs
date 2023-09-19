@@ -1,5 +1,4 @@
 use crate::{
-    chaos::ChaosConfig,
     eth::{
         backend::{
             db::{Db, SerializableState},
@@ -8,6 +7,7 @@ use crate::{
             mem::fork_db::ForkedDatabase,
             time::duration_since_unix_epoch,
         },
+        chaos::ChaosConfig,
         fees::{INITIAL_BASE_FEE, INITIAL_GAS_PRICE},
         pool::transactions::TransactionOrder,
     },

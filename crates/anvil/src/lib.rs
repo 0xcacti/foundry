@@ -111,6 +111,7 @@ pub async fn spawn(mut config: NodeConfig) -> (EthApi, NodeHandle) {
         no_mining,
         transaction_order,
         genesis,
+        chaos_config,
         ..
     } = config.clone();
 
