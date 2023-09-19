@@ -68,6 +68,17 @@ pub struct NodeArgs {
     #[clap(long, value_parser = Hardfork::from_str)]
     pub hardfork: Option<Hardfork>,
 
+    /// Settings for chaos mode fault injection
+    ///
+    /// Specify a list of APIs and frequencies for which to inject faults e.g `--chaos-config
+    /// tx:0.01,send:0.01`
+    /// [default: tx:0.01]
+    #[clap(
+        long,
+        value_parser = ChaosConfig::from_str
+    )]
+    pub chaos_config: Option<ChaosConfig>,
+
     /// Block time in seconds for interval mining.
     #[clap(short, long, visible_alias = "blockTime", name = "block-time", value_name = "SECONDS")]
     pub block_time: Option<u64>,
@@ -153,12 +164,6 @@ pub struct NodeArgs {
 
     #[clap(flatten)]
     pub server_config: ServerConfig,
-
-    #[clap(
-        long,
-        value_parser = ChaosConfig::from_str
-    )]
-    pub chaos_config: Option<ChaosConfig>,
 }
 
 #[cfg(windows)]
