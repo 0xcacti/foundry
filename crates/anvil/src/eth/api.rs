@@ -408,7 +408,7 @@ impl EthApi {
     fn intercept_execute(&self, request: &EthRequest) -> Option<ResponseResult> {
         if let Some(chaos_config) = &self.chaos_config {
             let random_val: f64 = rand::random(); // Assuming you have rand crate
-            if random_val <= self.failure_probability() {
+            if random_val <= 0.01 {
                 return Some(ResponseResult::Error(RpcError {
                     code: ErrorCode::ServerError(5000), // Example error code, you can change this
                     message: Cow::Borrowed("Chaos interception triggered"),
