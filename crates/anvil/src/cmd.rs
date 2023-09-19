@@ -1,6 +1,9 @@
 use crate::{
     config::DEFAULT_MNEMONIC,
-    eth::{backend::db::SerializableState, pool::transactions::TransactionOrder, EthApi},
+    eth::{
+        backend::db::SerializableState, chaos::ChaosConfig, pool::transactions::TransactionOrder,
+        EthApi,
+    },
     genesis::Genesis,
     AccountGenerator, Hardfork, NodeConfig, CHAIN_ID,
 };
@@ -150,6 +153,12 @@ pub struct NodeArgs {
 
     #[clap(flatten)]
     pub server_config: ServerConfig,
+
+    #[clap(
+        long,
+        value_parser = ChaosConfig::from_str
+    )]
+    pub chaos_config: Option<ChaosConfig>,
 }
 
 #[cfg(windows)]
