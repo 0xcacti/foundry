@@ -7,6 +7,7 @@ use crate::{
             notifications::NewBlockNotifications,
             validate::TransactionValidator,
         },
+        chaos::ChaosConfig,
         error::{
             decode_revert_reason, BlockchainError, FeeHistoryError, InvalidTransactionError,
             Result, ToRpcResponseResult,
@@ -107,6 +108,8 @@ pub struct EthApi {
     transaction_order: Arc<RwLock<TransactionOrder>>,
     /// Whether we're listening for RPC calls
     net_listening: bool,
+    /// Configuration for chaos testing
+    chaos_config: Option<ChaosConfig>,
 }
 
 // === impl Eth RPC API ===
@@ -124,6 +127,7 @@ impl EthApi {
         logger: LoggingManager,
         filters: Filters,
         transactions_order: TransactionOrder,
+        chaos_config: Option<ChaosConfig>,
     ) -> Self {
         Self {
             pool,
@@ -137,6 +141,7 @@ impl EthApi {
             filters,
             net_listening: true,
             transaction_order: Arc::new(RwLock::new(transactions_order)),
+            chaos_config,
         }
     }
 

@@ -50,8 +50,6 @@ use crate::server::{
 };
 pub use hardfork::Hardfork;
 
-/// support for chaos mode (fault injection)
-pub mod chaos;
 /// ethereum related implementations
 pub mod eth;
 /// support for polling filters
