@@ -42,10 +42,7 @@ use anvil_core::{
     },
     types::{EvmMineOptions, Forking, Index, NodeEnvironment, NodeForkConfig, NodeInfo, Work},
 };
-use anvil_rpc::{
-    error::{ErrorCode, RpcError},
-    response::ResponseResult,
-};
+use anvil_rpc::{error::RpcError, response::ResponseResult};
 use ethers::{
     abi::ethereum_types::H64,
     prelude::{DefaultFrame, TxpoolInspect},
@@ -71,7 +68,7 @@ use foundry_evm::{
 };
 use futures::channel::mpsc::Receiver;
 use parking_lot::RwLock;
-use std::{borrow::Cow, collections::HashSet, sync::Arc, time::Duration};
+use std::{collections::HashSet, sync::Arc, time::Duration};
 use tracing::{trace, warn};
 
 use super::{backend::mem::BlockRequest, sign::build_typed_transaction};
