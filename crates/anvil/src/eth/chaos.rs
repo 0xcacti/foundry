@@ -2,18 +2,18 @@ use std::str::FromStr;
 
 #[derive(Debug, Clone)]
 pub struct ChaosConfig {
-    pub tx: Option<f32>,
-    pub send: Option<f32>,
-    pub get_log: Option<f32>,
-    pub stream_log: Option<f32>,
+    pub tx: Option<f64>,
+    pub send: Option<f64>,
+    pub get_log: Option<f64>,
+    pub stream_log: Option<f64>,
 }
 
 impl ChaosConfig {
     pub fn new(
-        tx: Option<f32>,
-        send: Option<f32>,
-        get_log: Option<f32>,
-        stream_log: Option<f32>,
+        tx: Option<f64>,
+        send: Option<f64>,
+        get_log: Option<f64>,
+        stream_log: Option<f64>,
     ) -> Self {
         Self { tx, send, get_log, stream_log }
     }
@@ -37,7 +37,7 @@ impl FromStr for ChaosConfig {
                 2 => {
                     let value_str = components[1].trim();
                     value_str
-                        .parse::<f32>()
+                        .parse::<f64>()
                         .map_err(|_| format!("Failed to parse value: {}", value_str))?
                 }
                 _ => return Err(format!("Invalid chaos config: {}", config)),

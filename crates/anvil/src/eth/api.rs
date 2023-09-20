@@ -71,7 +71,6 @@ use foundry_evm::{
 };
 use futures::channel::mpsc::Receiver;
 use parking_lot::RwLock;
-use rand::{thread_rng, Rng};
 use std::{borrow::Cow, collections::HashSet, sync::Arc, time::Duration};
 use tracing::{trace, warn};
 
@@ -403,20 +402,6 @@ impl EthApi {
                 self.ots_get_contract_creator(address).await.to_rpc_result()
             }
         }
-    }
-
-    fn intercept_execute(&self, request: &EthRequest) -> Option<ResponseResult> {
-        if let Some(chaos_config) = &self.chaos_config {
-            let random_val: f64 = rand::random(); // Assuming you have rand crate
-            if random_val <= 0.01 {
-                return Some(ResponseResult::Error(RpcError {
-                    code: ErrorCode::ServerError(5000), // Example error code, you can change this
-                    message: Cow::Borrowed("Chaos interception triggered"),
-                    data: None,
-                }))
-            }
-        }
-        None
     }
 
     fn sign_request(
@@ -1142,7 +1127,21 @@ impl EthApi {
     /// Handler for ETH RPC call: `eth_getLogs`
     pub async fn logs(&self, filter: Filter) -> Result<Vec<Log>> {
         node_info!("eth_getLogs");
-        self.backend.logs(filter).await
+        let logs = self.backend.logs(filter).await;
+        if let Some(chaos_config) = &self.chaos_config {
+            if let Some(failure_rate) = chaos_config.get_log {
+                if rand::random::<f64>() < failure_rate {
+                    if let Ok(logs) = logs {
+                        return Ok(self.intercept_logs(logs, failure_rate))
+                    }
+                }
+            }
+        }
+        logs
+    }
+
+    fn intercept_logs(&self, logs: Vec<Log>, failure_rate: f64) -> Vec<Log> {
+        logs.into_iter().filter(|_| rand::random::<f64>() > failure_rate).collect()
     }
 
     /// Returns the hash of the current block, the seedHash, and the boundary condition to be met.
